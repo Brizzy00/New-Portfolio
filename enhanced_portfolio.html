@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ebisemiju Samuel - QA Engineer Portfolio</title>
+  <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.22.5/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+    * {
+      font-family: 'Inter', sans-serif;
+    }
+
+    .gradient-bg {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .glass-effect {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .dark .glass-effect {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .floating-animation {
+      animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+    }
+
+    .typing-animation {
+      overflow: hidden;
+      border-right: 3px solid #667eea;
+      animation: typing 3s steps(30) 1s forwards, blink 1s infinite;
+      white-space: nowrap;
+      width: 0;
+    }
+
+    @keyframes typing {
+      from { width: 0; }
+      to { width: 100%; }
+    }
+
+    @keyframes blink {
+      0%, 50% { border-color: #667eea; }
+      51%, 100% { border-color: transparent; }
+    }
+
+    .fade-in-up {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.6s ease;
+    }
+
+    .fade-in-up.animate {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .hover-scale {
+      transition: transform 0.3s ease;
+    }
+
+    .hover-scale:hover {
+      transform: scale(1.05);
+    }
+
+    .progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      z-index: 1000;
+      transition: width 0.3s ease;
+    }
+
+    .skill-bar {
+      height: 8px;
+      background: #e5e7eb;
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .skill-progress {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      border-radius: 4px;
+      transition: width 2s ease;
+      position: relative;
+    }
+
+    .skill-progress::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+      animation: shimmer 2s infinite;
+    }
+
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 50%;
+      animation: particle-float 8s infinite linear;
+    }
+
+    @keyframes particle-float {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-100px) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    .form-input {
+      transition: all 0.3s ease;
+    }
+
+    .form-input:focus {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+    }
+  </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    // Particle Component
+    const Particles = () => {
+      const particles = Array.from({ length: 20 }, (_, i) => (
+        <div
+          key={i}
+          className="particle"
+          style={{
+            left: `${Math.random() * 100}%`,
+            animationDelay: `${Math.random() * 8}s`,
+            animationDuration: `${8 + Math.random() * 4}s`
+          }}
+        />
+      ));
+
+      return <div className="fixed inset-0 pointer-events-none overflow-hidden">{particles}</div>;
+    };
+
+    // Progress Bar Component
+    const ProgressBar = () => {
+      const [scrollProgress, setScrollProgress] = useState(0);
+
+      useEffect(() => {
+        const handleScroll = () => {
+          const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+          const progress = (window.scrollY / totalHeight) * 100;
+          setScrollProgress(progress);
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+      }, []);
+
+      return <div className="progress-bar" style={{ width: `${scrollProgress}%` }} />;
+    };
+
+    // Theme Toggle Component
+    const ThemeToggle = () => {
+      const [isDark, setIsDark] = useState(false);
+
+      useEffect(() => {
+        if (isDark) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      }, [isDark]);
+
+      return (
+        <button
+          onClick={() => setIsDark(!isDark)}
+          className="fixed top-20 right-4 z-50 p-3 rounded-full glass-effect hover:scale-110 transition-transform duration-300"
+        >
+          {isDark ? '🌞' : '🌙'}
+        </button>
+      );
+    };
+
+    // Navigation Component
+    const NavBar = () => {
+      const [isOpen, setIsOpen] = useState(false);
+      const [activeSection, setActiveSection] = useState('about');
+
+      const navItems = ['About', 'Skills', 'Projects', 'Test Case', 'Bug Report', 'Achievements', 'Contact'];
+
+      useEffect(() => {
+        const handleScroll = () => {
+          const sections = navItems.map(item => document.getElementById(item.toLowerCase().replace(' ', '-')));
+          const scrollPosition = window.scrollY + 100;
+
+          for (let i = sections.length - 1; i >= 0; i--) {
+            if (sections[i] && sections[i].offsetTop <= scrollPosition) {
+              setActiveSection(navItems[i].toLowerCase().replace(' ', '-'));
+              break;
+            }
+          }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+      }, []);
+
+      const scrollToSection = (sectionId) => {
+        const element = document.getElementById(sectionId);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+        setIsOpen(false);
+      };
+
+      return (
+        <nav className="fixed top-0 w-full glass-effect z-40 transition-all duration-300">
+          <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 className="text-xl font-bold text-gray-800 dark:text-white">Ebisemiju Samuel</h1>
+
+            {/* Desktop Menu */}
+            <div className="hidden md:flex space-x-6">
+              {navItems.map((item) => {
+                const sectionId = item.toLowerCase().replace(' ', '-');
+                return (
+                  <button
+                    key={item}
+                    onClick={() => scrollToSection(sectionId)}
+                    className={`px-3 py-2 rounded-lg transition-all duration-300 ${
+                      activeSection === sectionId
+                        ? 'text-blue-600 bg-blue-100 dark:bg-blue-900 dark:text-blue-300'
+                        : 'text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400'
+                    }`}
+                  >
+                    {item}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="md:hidden p-2 text-gray-600 dark:text-gray-300"
+            >
+              <div className={`w-6 h-0.5 bg-current transition-all duration-300 ${isOpen ? 'rotate-45 translate-y-2' : ''}`}></div>
+              <div className={`w-6 h-0.5 bg-current mt-1 transition-all duration-300 ${isOpen ? 'opacity-0' : ''}`}></div>
+              <div className={`w-6 h-0.5 bg-current mt-1 transition-all duration-300 ${isOpen ? '-rotate-45 -translate-y-2' : ''}`}></div>
+            </button>
+          </div>
+
+          {/* Mobile Menu */}
+          <div className={`md:hidden transition-all duration-300 ${isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'} overflow-hidden`}>
+            <div className="px-4 py-2 space-y-2">
+              {navItems.map((item) => {
+                const sectionId = item.toLowerCase().replace(' ', '-');
+                return (
+                  <button
+                    key={item}
+                    onClick={() => scrollToSection(sectionId)}
+                    className="block w-full text-left px-3 py-2 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                  >
+                    {item}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </nav>
+      );
+    };
+
+    // Intersection Observer Hook
+    const useIntersectionObserver = (options = {}) => {
+      const [isIntersecting, setIsIntersecting] = useState(false);
+      const targetRef = useRef(null);
+
+      useEffect(() => {
+        const observer = new IntersectionObserver(([entry]) => {
+          setIsIntersecting(entry.isIntersecting);
+        }, options);
+
+        if (targetRef.current) {
+          observer.observe(targetRef.current);
+        }
+
+        return () => {
+          if (targetRef.current) {
+            observer.unobserve(targetRef.current);
+          }
+        };
+      }, []);
+
+      return [targetRef, isIntersecting];
+    };
+
+    // Section Component
+    const Section = ({ id, title, children, className = "" }) => {
+      const [ref, isVisible] = useIntersectionObserver({ threshold: 0.1 });
+
+      return (
+        <section
+          ref={ref}
+          id={id}
+          className={`py-16 px-4 max-w-6xl mx-auto ${className}`}
+        >
+          <h2 className={`text-4xl font-bold text-gray-800 dark:text-white mb-8 text-center fade-in-up ${isVisible ? 'animate' : ''}`}>
+            {title}
+          </h2>
+          <div className={`fade-in-up ${isVisible ? 'animate' : ''}`} style={{ transitionDelay: '0.2s' }}>
+            {children}
+          </div>
+        </section>
+      );
+    };
+
+    // Skill Bar Component
+    const SkillBar = ({ skill, percentage, delay = 0 }) => {
+      const [ref, isVisible] = useIntersectionObserver({ threshold: 0.5 });
+      const [animatedPercentage, setAnimatedPercentage] = useState(0);
+
+      useEffect(() => {
+        if (isVisible) {
+          setTimeout(() => {
+            setAnimatedPercentage(percentage);
+          }, delay);
+        }
+      }, [isVisible, percentage, delay]);
+
+      return (
+        <div ref={ref} className="mb-6">
+          <div className="flex justify-between mb-2">
+            <span className="text-gray-700 dark:text-gray-300 font-medium">{skill}</span>
+            <span className="text-gray-600 dark:text-gray-400">{percentage}%</span>
+          </div>
+          <div className="skill-bar">
+            <div
+              className="skill-progress"
+              style={{ width: `${animatedPercentage}%` }}
+            />
+          </div>
+        </div>
+      );
+    };
+
+    // Project Card Component
+    const ProjectCard = ({ title, role, timeline, description, contributions, tools, outcome, delay = 0 }) => {
+      const [ref, isVisible] = useIntersectionObserver({ threshold: 0.1 });
+
+      return (
+        <div
+          ref={ref}
+          className={`bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg hover-scale mb-8 fade-in-up ${isVisible ? 'animate' : ''}`}
+          style={{ transitionDelay: `${delay}s` }}
+        >
+          <div className="flex justify-between items-start mb-4">
+            <h3 className="text-2xl font-bold text-gray-800 dark:text-white">{title}</h3>
+            <span className="text-sm text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-3 py-1 rounded-full">
+              {role}
+            </span>
+          </div>
+          <p className="text-gray-600 dark:text-gray-400 mb-4"><strong>Timeline:</strong> {timeline}</p>
+          <p className="text-gray-700 dark:text-gray-300 mb-4">{description}</p>
+
+          <div className="mb-4">
+            <h4 className="font-semibold text-gray-800 dark:text-white mb-2">Key Contributions:</h4>
+            <ul className="space-y-2">
+              {contributions.map((item, index) => (
+                <li key={index} className="flex items-start text-gray-700 dark:text-gray-300">
+                  <span className="text-blue-600 dark:text-blue-400 mr-2">▸</span>
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="mb-4">
+            <p className="text-gray-600 dark:text-gray-400"><strong>Tools:</strong> {tools}</p>
+          </div>
+
+          <div className="bg-green-50 dark:bg-green-900 p-4 rounded-lg">
+            <p className="text-green-800 dark:text-green-200"><strong>Outcome:</strong> {outcome}</p>
+          </div>
+        </div>
+      );
+    };
+
+    // Contact Form Component
+    const ContactForm = () => {
+      const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        subject: '',
+        message: ''
+      });
+      const [isSubmitting, setIsSubmitting] = useState(false);
+      const [isSubmitted, setIsSubmitted] = useState(false);
+
+      const handleChange = (e) => {
+        setFormData({
+          ...formData,
+          [e.target.name]: e.target.value
+        });
+      };
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+
+        // Simulate form submission
+        setTimeout(() => {
+          setIsSubmitting(false);
+          setIsSubmitted(true);
+          setFormData({ name: '', email: '', subject: '', message: '' });
+
+          setTimeout(() => {
+            setIsSubmitted(false);
+          }, 3000);
+        }, 2000);
+      };
+
+      if (isSubmitted) {
+        return (
+          <div className="text-center py-12">
+            <div className="text-6xl mb-4">✅</div>
+            <h3 className="text-2xl font-bold text-green-600 dark:text-green-400 mb-2">Message Sent!</h3>
+            <p className="text-gray-600 dark:text-gray-400">Thank you for reaching out. I'll get back to you soon!</p>
+          </div>
+        );
+      }
+
+      return (
+        <div className="max-w-2xl mx-auto">
+          <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg">
+            <form className="space-y-6" onSubmit={handleSubmit}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-gray-700 dark:text-gray-300 font-medium mb-2">Name</label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg form-input bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-gray-700 dark:text-gray-300 font-medium mb-2">Email</label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg form-input bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-gray-700 dark:text-gray-300 font-medium mb-2">Subject</label>
+                <input
+                  type="text"
+                  name="subject"
+                  value={formData.subject}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg form-input bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-gray-700 dark:text-gray-300 font-medium mb-2">Message</label>
+                <textarea
+                  name="message"
+                  value={formData.message}
+                  onChange={handleChange}
+                  rows={6}
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg form-input bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none"
+                  required
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full gradient-bg text-white py-4 px-6 rounded-lg font-semibold text-lg hover:scale-105 transition-transform duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSubmitting ? (
+                  <div className="flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white mr-2"></div>
+                    Sending...
+                  </div>
+                ) : (
+                  'Send Message'
+                )}
+              </button>
+            </form>
+          </div>
+
+          <div className="mt-8 text-center">
+            <p className="text-gray-600 dark:text-gray-400 mb-4">Or reach out directly:</p>
+            <div className="flex justify-center space-x-6 text-sm">
+              <a href="mailto:ebisemijusamuel1@gmail.com" className="text-blue-600 dark:text-blue-400 hover:underline">
+                📧 ebisemijusamuel1@gmail.com
+              </a>
+              <a href="tel:+234-903-026-9827" className="text-blue-600 dark:text-blue-400 hover:underline">
+                📱 +234-903-026-9827
+              </a>
+            </div>
+            <div className="flex justify-center space-x-4 mt-4">
+              <a href="https://www.linkedin.com/in/samuel-e-0120622611" className="text-blue-600 dark:text-blue-400 hover:scale-110 transition-transform">
+                🔗 LinkedIn
+              </a>
+              <a href="https://github.com/Brizy00" className="text-gray-800 dark:text-gray-300 hover:scale-110 transition-transform">
+                💻 GitHub
+              </a>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // Main App Component
+    const App = () => {
+      const [typingComplete, setTypingComplete] = useState(false);
+
+      useEffect(() => {
+        setTimeout(() => setTypingComplete(true), 4000);
+      }, []);
+
+      return (
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+          <ProgressBar />
+          <Particles />
+          <ThemeToggle />
+          <NavBar />
+
+          {/* Hero Section */}
+          <header className="relative gradient-bg text-white py-32 text-center mt-16 overflow-hidden">
+            <div className="relative z-10">
+              <div className="floating-animation">
+                <h1 className="text-6xl font-bold mb-4">Ebisemiju Samuel</h1>
+                <div className="h-12 flex items-center justify-center">
+                  <p className={`text-2xl ${typingComplete ? '' : 'typing-animation'}`}>
+                    QA Engineer | Test Automation Specialist
+                  </p>
+                </div>
+                <div className="mt-8">
+                  <button
+                    onClick={() => document.getElementById('about').scrollIntoView({ behavior: 'smooth' })}
+                    className="bg-white text-blue-600 px-8 py-3 rounded-full font-semibold hover:scale-110 transition-transform duration-300 shadow-lg"
+                  >
+                    Discover My Work
+                  </button>
+                </div>
+              </div>
+            </div>
+          </header>
+
+          {/* About Section */}
+          <Section id="about" title="About Me">
+            <div className="text-center max-w-4xl mx-auto">
+              <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
+                I'm a dedicated QA Engineer with a passion for delivering flawless user experiences through meticulous testing and automation. By blending precision, creativity, and efficiency, I build robust test frameworks that catch bugs early, reduce technical debt, and enhance product quality. With hands-on experience in testing complex workflows across diverse user roles, I thrive in dynamic environments, ensuring seamless software solutions that meet user and business needs.
+              </p>
+            </div>
+          </Section>
+
+          {/* Skills Section */}
+          <Section id="skills" title="Skills & Technologies" className="bg-white dark:bg-gray-800">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+              <div>
+                <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">Technical Skills</h3>
+                <SkillBar skill="Test Automation (Selenium, Cypress)" percentage={90} delay={0} />
+                <SkillBar skill="Manual Testing" percentage={95} delay={200} />
+                <SkillBar skill="API Testing (Postman)" percentage={85} delay={400} />
+                <SkillBar skill="Python" percentage={80} delay={600} />
+                <SkillBar skill="JavaScript" percentage={75} delay={800} />
+                <SkillBar skill="Test Case Design" percentage={95} delay={1000} />
+              </div>
+
+              <div>
+                <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">Tools & Platforms</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  {['QASE', 'Notion', 'JIRA', 'GitHub', 'TestRail', 'Postman', 'Selenium', 'Cypress'].map((tool, index) => (
+                    <div key={tool} className="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg text-center hover-scale">
+                      <span className="text-gray-800 dark:text-gray-200 font-medium">{tool}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </Section>
+
+          {/* Projects Section */}
+          <Section id="projects" title="Featured Projects">
+            <ProjectCard
+              title="Shelf Life (E-commerce: Pharmaceuticals)"
+              role="QA Tester"
+              timeline="Apr 2025 - Present"
+              description="Validated a pharmaceutical e-commerce platform, ensuring seamless functionality across user, global planner, operator, driver, and admin workflows."
+              contributions={[
+                "Authored 10+ manual test cases covering end-to-end order processing and inventory management.",
+                "Validated admin product updates, inventory synchronization, and regression flows, reducing bug leakage by 30%.",
+                "Identified and reported 15+ critical staging bugs, including inventory sync issues, ensuring resolution before release."
+              ]}
+              tools="JIRA, Notion, GitHub"
+              outcome="Achieved 100% regression pass rate, enabling a smooth platform launch with zero critical defects in production."
+              delay={0}
+            />
+            <ProjectCard
+              title="NHLMMS (Nigeria Health Logistics Management Information System)"
+              role="QA Tester"
+              timeline="May 2025 - Present"
+              description="Tested a national health logistics platform to ensure reliable data flows and user interactions for facility, warehouse, and national user roles."
+              contributions={[
+                "Validated login, data flows, and workflows in staging environments, covering 20+ user scenarios.",
+                "Reported 10+ bugs with detailed, reproducible steps, reducing developer debugging time by 25%.",
+                "Conducted retests to confirm resolutions, ensuring platform stability."
+              ]}
+              tools="JIRA, Notion, Postman, GitHub"
+              outcome="Resolved all critical staging issues, contributing to a stable platform rollout across Nigeria."
+              delay={0.2}
+            />
+          </Section>
+
+          {/* Test Case Section */}
+          <Section id="test-case" title="Sample Test Case" className="bg-white dark:bg-gray-800">
+            <div className="max-w-4xl mx-auto bg-gray-50 dark:bg-gray-700 p-8 rounded-2xl shadow-lg">
+              <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">End-to-End Order Completion Flow</h3>
+
+              <div className="space-y-6">
+                <div>
+                  <h4 className="text-lg font-semibold text-blue-600 dark:text-blue-400 mb-2">🎯 Objective</h4>
+                  <p className="text-gray-700 dark:text-gray-300">Verify seamless order progression through all user roles with accurate status updates.</p>
+                </div>
+
+                <div>
+                  <h4 className="text-lg font-semibold text-blue-600 dark:text-blue-400 mb-2">📋 Prerequisites</h4>
+                  <p className="text-gray-700 dark:text-gray-300">Valid user credentials for User, Global Planner, Operator, and Driver roles; staging environment access.</p>
+                </div>
+
+                <div>
+                  <h4 className="text-lg font-semibold text-blue-600 dark:text-blue-400 mb-2">🔧 Test Steps</h4>
+                  <ol className="list-decimal pl-6 space-y-2 text-gray-700 dark:text-gray-300">
+                    <li>Log in as a User and navigate to the products tab.</li>
+                    <li>Select 2+ products and proceed to checkout.</li>
+                    <li>Verify product quantity, select a payment plan, and complete payment.</li>
+                    <li>Confirm order creation in the user dashboard.</li>
+                    <li>Log in as a Global Planner and approve the order.</li>
+                    <li>Log in as an Operator, confirm delivery, and assign for pickup.</li>
+                    <li>Log in as a Driver, select delivery, and sign off.</li>
+                  </ol>
+                </div>
+
+                <div>
+                  <h4 className="text-lg font-semibold text-green-600 dark:text-green-400 mb-2">✅ Expected Result</h4>
+                  <p className="text-gray-700 dark:text-gray-300">The order progresses through User, Global Planner, Operator, and Driver roles, with status updates (e.g., "Pending," "Approved," "Delivered") reflected accurately at each stage.</p>
+                </div>
+              </div>
+            </div>
+          </Section>
+
+          {/* Bug Report Section */}
+          <Section id="bug-report" title="Sample Bug Report">
+            <div className="max-w-4xl mx-auto bg-red-50 dark:bg-red-900/20 p-8 rounded-2xl shadow-lg border-l-4 border-red-500">
+              <div className="flex items-center mb-6">
+                <span className="text-3xl mr-3">🐛</span>
+                <h3 className="text-2xl font-bold text-red-700 dark:text-red-400">Shelf Life - Incorrect Inventory Count</h3>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
+                  <h4 className="font-semibold text-gray-800 dark:text-white mb-2">📊 Bug Details</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-1"><strong>Severity:</strong> High</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-1"><strong>Priority:</strong> High</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400"><strong>Status:</strong> Open</p>
+                </div>
+
+                <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
+                  <h4 className="font-semibold text-gray-800 dark:text-white mb-2">🔧 Environment</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-1"><strong>Platform:</strong> Shelf Life (Staging)</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-1"><strong>Browser:</strong> Chrome v124.0</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400"><strong>OS:</strong> Windows 10</p>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                <div>
+                  <h4 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">📝 Summary</h4>
+                  <p className="text-gray-700 dark:text-gray-300">Post-delivery, the admin dashboard fails to update product inventory counts, showing unchanged quantities.</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h4 className="text-lg font-semibold text-green-600 dark:text-green-400 mb-2">✅ Expected Behavior</h4>
+                    <p className="text-gray-700 dark:text-gray-300">After a Driver marks an order as "Delivered," the system deducts the ordered quantity from inventory and updates the admin panel.</p>
+                  </div>
+
+                  <div>
+                    <h4 className="text-lg font-semibold text-red-600 dark:text-red-400 mb-2">❌ Actual Behavior</h4>
+                    <p className="text-gray-700 dark:text-gray-300">Inventory quantities remain unchanged despite successful delivery.</p>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-lg font-semibold text-blue-600 dark:text-blue-400 mb-2">🔄 Steps to Reproduce</h4>
+                  <ol className="list-decimal pl-6 space-y-2 text-gray-700 dark:text-gray-300">
+                    <li>Log in as a User and place an order for an in-stock product (e.g., 5 units).</li>
+                    <li>Log in as a Global Planner and approve the order.</li>
+                    <li>Log in as an Operator and mark the order as ready for pickup.</li>
+                    <li>Log in as a Driver and complete the delivery.</li>
+                    <li>Log in as an Admin and check the inventory tab for the product's stock count.</li>
+                  </ol>
+                </div>
+
+                <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg border-l-4 border-yellow-500">
+                  <h4 className="text-lg font-semibold text-yellow-700 dark:text-yellow-400 mb-2">⚠️ Impact</h4>
+                  <p className="text-gray-700 dark:text-gray-300">Inaccurate inventory risks overselling, stock-outs, and financial discrepancies, affecting Operators, Admins, and Global Planners.</p>
+                </div>
+              </div>
+            </div>
+          </Section>
+
+          {/* Achievements Section */}
+          <Section id="achievements" title="Key Achievements" className="bg-white dark:bg-gray-800">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {[
+                {
+                  icon: "🏆",
+                  title: "Bug Detection Excellence",
+                  description: "Identified 15+ staging bugs, including high-severity inventory sync issues, preventing production defects."
+                },
+                {
+                  icon: "⚡",
+                  title: "Process Optimization",
+                  description: "Developed structured test cases and bug reports, reducing bug resolution time by 25%."
+                },
+                {
+                  icon: "🎯",
+                  title: "Multi-Role Testing",
+                  description: "Mastered testing across 5+ user roles, ensuring end-to-end functionality for complex workflows."
+                },
+                {
+                  icon: "🤖",
+                  title: "Automation Innovation",
+                  description: "Introduced Selenium-based scripts to automate repetitive regression tests, saving 10+ hours per sprint."
+                }
+              ].map((achievement, index) => (
+                <div key={index} className="bg-gray-50 dark:bg-gray-700 p-6 rounded-xl hover-scale">
+                  <div className="text-4xl mb-4">{achievement.icon}</div>
+                  <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">{achievement.title}</h3>
+                  <p className="text-gray-600 dark:text-gray-300">{achievement.description}</p>
+                </div>
+              ))}
+            </div>
+          </Section>
+
+          {/* Testimonials Section */}
+          <Section id="testimonials" title="What Colleagues Say">
+            <div className="max-w-4xl mx-auto">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {[
+                  {
+                    quote: "Samuel's attention to detail is exceptional. His thorough test cases helped us catch critical bugs before production.",
+                    author: "Tech Lead",
+                    company: "Shelf Life Project"
+                  },
+                  {
+                    quote: "His automation scripts significantly improved our testing efficiency. A true professional who delivers results.",
+                    author: "Project Manager",
+                    company: "NHLMMS Project"
+                  }
+                ].map((testimonial, index) => (
+                  <div key={index} className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg hover-scale">
+                    <div className="text-blue-600 dark:text-blue-400 text-4xl mb-4">"</div>
+                    <p className="text-gray-700 dark:text-gray-300 mb-4 italic">{testimonial.quote}</p>
+                    <div className="border-t pt-4">
+                      <p className="font-semibold text-gray-800 dark:text-white">{testimonial.author}</p>
+                      <p className="text-gray-600 dark:text-gray-400 text-sm">{testimonial.company}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Section>
+
+          {/* Contact Section */}
+          <Section id="contact" title="Let's Collaborate">
+            <div className="text-center mb-8">
+              <p className="text-lg text-gray-700 dark:text-gray-300 max-w-2xl mx-auto">
+                I'd love to discuss how my QA expertise can enhance your project's quality. Reach out to collaborate on delivering flawless software solutions!
+              </p>
+            </div>
+            <ContactForm />
+          </Section>
+
+          {/* Footer */}
+          <footer className="gradient-bg text-white text-center py-8">
+            <div className="max-w-6xl mx-auto px-4">
+              <p className="mb-4">© 2025 Ebisemiju Samuel. All rights reserved.</p>
+              <div className="flex justify-center space-x-6">
+                <a href="https://www.linkedin.com/in/samuel-e-0120622611" className="hover:scale-110 transition-transform">
+                  LinkedIn
+                </a>
+                <a href="https://github.com/Brizzy00" className="hover:scale-110 transition-transform">
+                  GitHub
+                </a>
+                <a href="mailto:ebisemijusamuel1@gmail.com" className="hover:scale-110 transition-transform">
+                  Email
+                </a>
+              </div>
+            </div>
+          </footer>
+        </div>
+      );
+    };
+
+    // Render the app
+    ReactDOM.render(<App />, document.getElementById('root'));
+  </script>
+</body>
+</html>
