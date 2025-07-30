@@ -196,25 +196,34 @@
 
     // Theme Toggle Component
     const ThemeToggle = () => {
-      const [isDark, setIsDark] = useState(false);
+      const [isDark, setIsDark] = useState(() => {
+        const saved = localStorage.getItem('theme');
+        if (saved) return saved === 'dark';
+        return window.matchMedia('(prefers-color-scheme: dark)').matches;
+     });
 
       useEffect(() => {
+        const html = document.documentElement;
         if (isDark) {
-          document.documentElement.classList.add('dark');
-        } else {
-          document.documentElement.classList.remove('dark');
-        }
+          html.classList.add('dark');
+          localStorage.setItem('theme', 'dark');
+       } else {
+          html.classList.remove('dark');
+          localStorage.setItem('theme', 'light');
+       }
       }, [isDark]);
 
       return (
         <button
-          onClick={() => setIsDark(!isDark)}
+         onClick={() => setIsDark(!isDark)}
           className="fixed top-20 right-4 z-50 p-3 rounded-full glass-effect hover:scale-110 transition-transform duration-300"
-        >
-          {isDark ? '🌞' : '🌙'}
-        </button>
+          aria-label="Toggle Theme"
+       >
+        {isDark ? '🌞' : '🌙'}
+       </button>
       );
     };
+
 
     // Navigation Component
     const NavBar = () => {
@@ -438,21 +447,31 @@
         });
       };
 
-      const handleSubmit = (e) => {
-        e.preventDefault();
-        setIsSubmitting(true);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
 
-        // Simulate form submission
-        setTimeout(() => {
-          setIsSubmitting(false);
-          setIsSubmitted(true);
-          setFormData({ name: '', email: '', subject: '', message: '' });
+    try {
+      const response = await fetch("https://formspree.io/f/mblkkrvb", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
 
-          setTimeout(() => {
-            setIsSubmitted(false);
-          }, 3000);
-        }, 2000);
-      };
+      if (response.ok) {
+        setIsSubmitted(true);
+        setFormData({ name: '', email: '', subject: '', message: '' });
+        setTimeout(() => setIsSubmitted(false), 3000);
+    } else {
+      alert("There was an error submitting the form.");
+    }
+  } catch (error) {
+    alert("Submission failed. Try again.");
+  }
+
+  setIsSubmitting(false);
+};
+
 
       if (isSubmitted) {
         return (
@@ -545,10 +564,10 @@
               </a>
             </div>
             <div className="flex justify-center space-x-4 mt-4">
-              <a href="https://www.linkedin.com/in/samuel-e-0120622611" className="text-blue-600 dark:text-blue-400 hover:scale-110 transition-transform">
+              <a href="https://www.linkedin.com/in/samuel-e-0120b2261/" className="text-blue-600 dark:text-blue-400 hover:scale-110 transition-transform">
                 🔗 LinkedIn
               </a>
-              <a href="https://github.com/Brizy00" className="text-gray-800 dark:text-gray-300 hover:scale-110 transition-transform">
+              <a href="https://github.com/Brizzy00" className="text-gray-800 dark:text-gray-300 hover:scale-110 transition-transform">
                 💻 GitHub
               </a>
             </div>
@@ -641,12 +660,12 @@
                 "Validated admin product updates, inventory synchronization, and regression flows, reducing bug leakage by 30%.",
                 "Identified and reported 15+ critical staging bugs, including inventory sync issues, ensuring resolution before release."
               ]}
-              tools="JIRA, Notion, GitHub"
+              tools="QASE, Notion, GitHub"
               outcome="Achieved 100% regression pass rate, enabling a smooth platform launch with zero critical defects in production."
               delay={0}
             />
             <ProjectCard
-              title="NHLMMS (Nigeria Health Logistics Management Information System)"
+              title="NHLMIS (Nigeria Health Logistics Management Information System)"
               role="QA Tester"
               timeline="May 2025 - Present"
               description="Tested a national health logistics platform to ensure reliable data flows and user interactions for facility, warehouse, and national user roles."
@@ -655,7 +674,7 @@
                 "Reported 10+ bugs with detailed, reproducible steps, reducing developer debugging time by 25%.",
                 "Conducted retests to confirm resolutions, ensuring platform stability."
               ]}
-              tools="JIRA, Notion, Postman, GitHub"
+              tools="QASE, Notion, Postman, GitHub"
               outcome="Resolved all critical staging issues, contributing to a stable platform rollout across Nigeria."
               delay={0.2}
             />
@@ -837,7 +856,7 @@
             <div className="max-w-6xl mx-auto px-4">
               <p className="mb-4">© 2025 Ebisemiju Samuel. All rights reserved.</p>
               <div className="flex justify-center space-x-6">
-                <a href="https://www.linkedin.com/in/samuel-e-0120622611" className="hover:scale-110 transition-transform">
+                <a href="https://www.linkedin.com/in/samuel-e-0120b2261/" className="hover:scale-110 transition-transform">
                   LinkedIn
                 </a>
                 <a href="https://github.com/Brizzy00" className="hover:scale-110 transition-transform">
